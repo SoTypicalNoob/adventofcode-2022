@@ -1,7 +1,7 @@
 (defun input (input-file)
   (uiop:read-file-lines input-file))
 
-(defparameter *input-file* (input "test"))
+(defparameter *input-file* (input "example-15"))
 
 (defun cave-gen (input)
   (let ((all-coors '()))
@@ -61,36 +61,37 @@
 
 (defun coverage (cave)
   (let* ((min-max (min-max cave))
-         (bx-min (nth 0 min-max))
-         (by-min (nth 1 min-max))
+         (x-min (nth 0 min-max))
+         (y-min (nth 1 min-max))
          (cave-array (cave-array cave))
          (x-max (1- (second (array-dimensions cave-array))))
          (y-max (1- (first (array-dimensions cave-array))))
-         (bx1 0)
-         (sx1 0)
-         (by1 0)
-         (sy1 0)
-         (manhattan 0))
-
+         (sx1 0) (sy1 0) (bx1 0) (by1 0)
+         (manhattan 0)
+         (not-beacon 0))
     (loop :for beacon :in cave
           :do (progn
-                (setq bx1 (- (nth 0 beacon) bx-min))
-                (setq by1 (- (nth 1 beacon) by-min))
-                (setq sx1 (- (nth 2 beacon) bx-min))
-                (setq sy1 (- (nth 3 beacon) by-min))
-                (setq manhattan (manhattan-calc (list bx1 by1 sx1 sy1)))
+                (setq sx1 (- (nth 0 beacon) x-min))
+                (setq sy1 (- (nth 1 beacon) y-min))
+                (setq bx1 (- (nth 2 beacon) x-min))
+                (setq by1 (- (nth 3 beacon) y-min))
+                (setq manhattan (manhattan-calc (list sx1 sy1 bx1 by1)))
                 (loop :for y :from 0 :to y-max
                       :do (progn
-                            (format t "~A" beacon)
+                            ;; (format t "~A" beacon)
                             (loop :for x :from 0 :to x-max
                                   :do (progn
-                                        (if (and (<= (manhattan-calc (list bx1 by1 x y)) manhattan)
+                                        (if (and (<= (manhattan-calc (list sx1 sy1 x y)) manhattan)
                                                  (not (equal (aref cave-array y x) "S"))
                                                  (not (equal (aref cave-array y x) "B")))
-                                            (format t "#")
-                                            (format t "~A" (aref cave-array y x)))))
-                            (format t "~%")))))
-    ))
+                                            (setf (aref cave-array y x) "#"))))))))
+    (loop :for x :from 0 :to x-max
+          :do (progn
+                (if (equal (aref cave-array 10 x) "#")
+                    (setq not-beacon (1+ not-beacon))))
+          )
+    (format t "Not Beacon: ~A~%" not-beacon)
+    cave-array))
 
 (defun print-array (input-array)
   (let ((x-max (1- (second (array-dimensions input-array))))
@@ -100,24 +101,80 @@
                            :do (format t "~A" (aref input-array y x)))
                      (format t "~%")))))
 
-;;;;
-    (loop for i from 0 below n do
-      (loop for j from 0 below m do
-        (format t "a[~a ~a] = ~a~%" i j (aref a i j))))
+(defun day-15-1-slow (cave Y)
+  (let* ((known (list))
+         (occupied (list))
+         (sx 0) (sy 0) (bx 0) (by 0)
+         (manhattan 0)
+         (offset 0)
+         (low-x 0)
+         (high-x 0))
+    (loop :for line :in cave
+          :do (progn
+                (setq sx (nth 0 line)) (setq sy (nth 1 line))
+                (setq bx (nth 2 line)) (setq by (nth 3 line))
+                (setq manhattan (manhattan-calc line))
+                (setq offset (- manhattan (abs (- sy Y))))
+                (when (not (< offset 0))
+                  (setq low-x (- sx offset))
+                  (setq high-x (+ sx offset))
+                  (loop :for x :from low-x :to high-x
+                        :do (push x known)))
+                (when (= by Y)
+                  (push by occupied))))
+    (- (length (remove-duplicates known))
+       (length (remove-duplicates occupied)))))
 
-CL-USER> (uiop:split-string "Sensor at x=2, y=18: closest beacon is at x=-2, y=15" :separator ":")
-("Sensor at x=2, y=18" " closest beacon is at x=-2, y=15")
-CL-USER> (uiop:split-string "Sensor at x=2, y=18" :separator ",")
-("Sensor at x=2" " y=18")
-CL-USER> (subseq "Sensor at x=2" 13)
-""
-CL-USER> (subseq "Sensor at x=2" 12)
-"2"
-CL-USER> (read-from-string (subseq "Sensor at x=2" 12))
-2 (2 bits, #x2, #o2, #b10)
-1 (1 bit, #x1, #o1, #b1)
-CL-USER> (subseq "Sensor at x=2" 12)
-"2"
-CL-USER> (read-from-string (subseq "Sensor at x=2" 12))
-2 (2 bits, #x2, #o2, #b10)
-1 (1 bit, #x1, #o1, #b1)
+;; (defun combine-intervals (intervals &optional (combined (pop intervals)))
+;;   (if (cdr intervals)
+;;       (let* (( (nth 0 intervals))
+;;              (second-line (nth 1 intervals)))
+;;         (format t "~A~%" combined)
+;;         (format t "~A~%" intervals)
+;;         (cond ((<= (second first-line) (first second-line))
+;;                (format t "true")))
+;;         intervals)))
+
+;; (defun day-15-1-optimized (cave Y)
+;;   (let* ((sx 0) (sy 0) (bx 0) (by 0)
+;;          (manhattan 0)
+;;          (offset 0)
+;;          (low-x 0)
+;;          (high-x 0)
+;;          (intervals (list)))
+;;     (loop :for line :in cave
+;;           :do (progn
+;;                 (setq sx (nth 0 line)) (setq sy (nth 1 line))
+;;                 (setq bx (nth 2 line)) (setq by (nth 3 line))
+;;                 (setq manhattan (manhattan-calc line))
+;;                 (setq offset (- manhattan (abs (- sy Y))))
+;;                 (when (not (< offset 0))
+;;                   (setq low-x (- sx offset))
+;;                   (setq high-x (+ sx offset))
+;;                   (push (list low-x high-x) intervals))))
+;;     (setq intervals (sort intervals #'< :key #'first))
+;;     intervals))
+
+(defun day-15-2-slow (cave y-max x-max)
+  (let* ((known (list))
+         (occupied (list))
+         (sx 0) (sy 0) (bx 0) (by 0)
+         (manhattan 0)
+         (offset 0)
+         (low-x 0)
+         (high-x 0))
+    (loop :for line :in cave
+          :do (progn
+                (setq sx (nth 0 line)) (setq sy (nth 1 line))
+                (setq bx (nth 2 line)) (setq by (nth 3 line))
+                (setq manhattan (manhattan-calc line))
+                (setq offset (- manhattan (abs (- sy Y))))
+                (when (not (< offset 0))
+                  (setq low-x (- sx offset))
+                  (setq high-x (+ sx offset))
+                  (loop :for x :from low-x :to high-x
+                        :do (push x known)))
+                (when (= by Y)
+                  (push by occupied))))
+    (- (length (remove-duplicates known))
+       (length (remove-duplicates occupied)))))
