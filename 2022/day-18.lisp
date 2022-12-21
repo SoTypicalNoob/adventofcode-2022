@@ -1,0 +1,36 @@
+(defun input (input-file)
+  (uiop:read-file-lines input-file))
+
+(defun droplets (droplets)
+  (loop :for droplet :in droplets
+        :collect (mapcar #'(lambda (x)
+                             (read-from-string x))
+                         (uiop:split-string droplet :separator ","))))
+
+(defun find-adjacents (droplets)
+  (let* ((cntr 0))
+    (format t "~A~%" (length (remove-duplicates droplets :test 'equal)))
+    (setq droplets (remove-duplicates droplets :test 'equal))
+    (loop :for droplet :in droplets
+          :do (progn
+                  (when (not (find (list (1+ (first droplet)) (second droplet) (third droplet)) droplets :test 'equal))
+                   (format t "Droplet: ~A, cntr: ~A~%" droplet cntr)
+                   (setq cntr (1+ cntr)))
+                  (when (not (find (list (1- (first droplet)) (second droplet) (third droplet)) droplets :test 'equal))
+                   (format t "Droplet: ~A, cntr: ~A~%" droplet cntr)
+                   (setq cntr (1+ cntr)))
+                  (when (not (find (list (first droplet) (1+ (second droplet)) (third droplet)) droplets :test 'equal))
+                   (format t "Droplet: ~A, cntr: ~A~%" droplet cntr)
+                   (setq cntr (1+ cntr)))
+                  (when (not (find (list (first droplet) (1- (second droplet)) (third droplet)) droplets :test 'equal))
+                   (format t "Droplet: ~A, cntr: ~A~%" droplet cntr)
+                   (setq cntr (1+ cntr)))
+                  (when (not (find (list (first droplet) (second droplet) (1+ (third droplet))) droplets :test 'equal))
+                   (format t "Droplet: ~A, cntr: ~A~%" droplet cntr)
+                   (setq cntr (1+ cntr)))
+                  (when (not (find (list (first droplet) (second droplet) (1- (third droplet))) droplets :test 'equal))
+                   (format t "Droplet: ~A, cntr: ~A~%" droplet cntr)
+                   (setq cntr (1+ cntr)))
+                  ))
+    cntr))
+
