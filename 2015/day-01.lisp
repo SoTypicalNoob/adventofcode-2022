@@ -34,4 +34,4 @@
                       :return cnt))
     cnt))
 
-(day-01-2 "inputs/input-01")
+(day-01-2 "inputs/inpt-01")
