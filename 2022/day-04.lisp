@@ -50,7 +50,7 @@
     (push (uiop:split-string (nth 0 (uiop:split-string line :separator ",")) :separator "-") assignment-list)
     assignment-list))
 
-CL-USER> (uiop:split-string "2-4,6-8" :separator ",")
-("2-4" "6-8")
-CL-USER> (uiop:split-string (nth 1 '("2-4" "6-8")) :separator "-")
-("6" "8")
+;; CL-USER> (uiop:split-string "2-4,6-8" :separator ",")
+;; ("2-4" "6-8")
+;; CL-USER> (uiop:split-string (nth 1 '("2-4" "6-8")) :separator "-")
+;; ("6" "8")

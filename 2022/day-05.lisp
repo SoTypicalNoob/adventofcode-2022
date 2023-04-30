@@ -62,5 +62,5 @@
     (mapcar #'car  *stacks*)))
 
 
-CL-USER> (nth (- (read-from-string (nth 3 *test*)) 1) *stacks*)
-("W" "R" "V" "Q" "F" "N" "J" "C")
+;; CL-USER> (nth (- (read-from-string (nth 3 *test*)) 1) *stacks*)
+;; ("W" "R" "V" "Q" "F" "N" "J" "C")

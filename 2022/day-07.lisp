@@ -32,10 +32,8 @@
           )
     output))
 
-CL-USER> (substitute '("c" "d") "b" '("a" "b" "c") :test #'equal)
-("a" ("c" "d") "c")
-
-;;;
+;; CL-USER> (substitute '("c" "d") "b" '("a" "b" "c") :test #'equal)
+;; ("a" ("c" "d") "c")
 
 (defun input-to-list ()
   (with-open-file (stream "test")
@@ -83,7 +81,3 @@ CL-USER> (substitute '("c" "d") "b" '("a" "b" "c") :test #'equal)
           :while line
           :do (progn
                 (if ())))))
-
-;;;;;
-;;;;;
-;;;;;
