@@ -1,0 +1,1 @@
+;; list with two number: x and y. list of list, where the previous x and y is incremented/decremented by the direction and the result is added to the list of lists. At the end, remove the duplicates, and count the lenght of the list of lists.
