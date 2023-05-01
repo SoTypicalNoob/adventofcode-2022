@@ -26,7 +26,7 @@
         (format t "~A~%~A~%" left right)
         (setq cnt (item-comp left right cnt))
         (side-comp (cdr (cdr input)))))
-  cnt)
+  cnt)                                  ; maybe this should be part of if?
 
 (defun day-13-1 (input-file)
   (let* ((input (input-to-list input-file)))
